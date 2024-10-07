@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "weather_app_proj",
+            "cwd": "weather_app_proj",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "weather_app_proj (profile mode)",
+            "cwd": "weather_app_proj",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "weather_app_proj (release mode)",
+            "cwd": "weather_app_proj",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Flutter",
+            "program": "lib/main.dart",
+            "cwd": "weather_app_proj",
+            "request": "launch",
+            "type": "dart"
+        }
+    ]
+}
