@@ -30,7 +30,6 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Widget build(BuildContext context) {
     return Autocomplete<Map<String, dynamic>>(
-      optionsViewOpenDirection: OptionsViewOpenDirection.down,
       optionsBuilder: widget.optionsBuilder,
       displayStringForOption: (op) => op["name"],
       optionsViewBuilder: (context, onSelected, options) {
