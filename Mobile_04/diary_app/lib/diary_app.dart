@@ -1,0 +1,143 @@
+import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:diary_app/profile_page.dart';
+
+import 'package:flutter/material.dart';
+
+const appScheme = 'diary_app';
+
+class Diary extends StatefulWidget {
+  const Diary({super.key});
+
+  @override
+  State<Diary> createState() => _MyDiaryState();
+}
+
+class _MyDiaryState extends State<Diary> {
+  Credentials? _credentials;
+  late Auth0 auth0;
+  final String _domain = 'dev-ra7dn18ereqy3pc6.us.auth0.com';
+  final String _clientId = 'AOe6xOhxY9yQxRUYfKmdcetz0UCkArLA';
+
+  bool isBusy = false;
+  late String errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+
+    auth0 = Auth0(_domain, _clientId);
+    errorMessage = '';
+  }
+
+  Future<void> loginAction() async {
+    setState(() {
+      isBusy = true;
+      errorMessage = '';
+    });
+
+    try {
+      final Credentials credentials =
+          await auth0.webAuthentication(scheme: appScheme).login();
+      goToProfilePage();
+      setState(() {
+        isBusy = false;
+        _credentials = credentials;
+      });
+    } on Exception catch (e, s) {
+      debugPrint('login error: $e - stack: $s');
+
+      setState(() {
+        isBusy = false;
+        errorMessage = e.toString();
+      });
+    }
+  }
+
+  Future<void> logoutAction() async {
+    setState(() {
+      isBusy = true;
+    });
+
+    await auth0.webAuthentication(scheme: appScheme).logout();
+
+    setState(() {
+      _credentials = null;
+      isBusy = false;
+    });
+  }
+
+  void goToProfilePage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (cont) => ProfilePage(
+                  cred: _credentials,
+                  logout: logoutAction,
+                )));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: isBusy
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.red,
+              ),
+            )
+          : Container(
+              decoration: const BoxDecoration(color: Colors.red),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      color: Colors.white,
+                      height: 100,
+                      child: const Center(
+                          child: Text('WELCOME TO YOUR\nDIARY',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20)))),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      side: const BorderSide(width: 1, color: Colors.green),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    onPressed: () async {
+                      if (_credentials == null) {
+                        await loginAction();
+                      } else if (context.mounted) {
+                        goToProfilePage();
+                      }
+                    },
+                    child: const Text('Login',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                  if (errorMessage != '')
+                    Container(
+                      width: 200,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                      ),
+                      child: Text(
+                        errorMessage,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
+    );
+  }
+}
+                   
